@@ -1,9 +1,9 @@
 import { AcademicCapIcon, LibraryIcon, PresentationChartBarIcon, TerminalIcon } from '@heroicons/react/outline'
-import { formatDateFr } from '../utils/dates'
-import { formatAmount } from '../utils/number'
-import { classNames, Heroicon } from '../utils/tw'
-import { AsyncReturnType } from '../utils/types'
-import { getSummaryForYear, Transaction, Type } from '../services/transactions'
+import { formatDateFr } from '../../utils/dates'
+import { formatAmount } from '../../utils/number'
+import { classNames, Heroicon } from '../../utils/tw'
+import { AsyncReturnType } from '../../utils/types'
+import { getSummaryForYear, Transaction, Type } from '../../services/transactions'
 import { useState } from 'react'
 import { LoaderFunction, useLoaderData, useOutletContext } from 'remix'
 import { deserialize, serialize } from 'superjson'
@@ -24,23 +24,29 @@ const statusStyles = {
 
 type LoaderData = AsyncReturnType<typeof getSummaryForYear> & { year: number, searchQuery: string }
 
-export const loader: LoaderFunction = async ({params}) => {
+export const loader: LoaderFunction = async ({ params }) => {
   const year = Number(params.year)
   const session = {}
 
   return serialize({
-      session,
-      ...(session ? await getSummaryForYear(year) : {}),
-      year,
+    session,
+    ...(session ? await getSummaryForYear(year) : {}),
+    year,
   })
 }
 
-const Card = ({ icon, title, amount, amountSecond, className }: { icon: string, title: string, amount: number, amountSecond?: number, className?: string }) => {
-  return <div className={classNames("bg-white overflow-hidden shadow rounded-lg", className)}>
+const Card = ({
+  icon,
+  title,
+  amount,
+  amountSecond,
+  className,
+}: { icon: string, title: string, amount: number, amountSecond?: number, className?: string }) => {
+  return <div className={classNames('bg-white overflow-hidden shadow rounded-lg', className)}>
     <div className="p-5">
       <div className="flex items-center">
         <div className="flex-shrink-0">
-          <span className="text-5xl" aria-hidden="true" >{icon}</span>
+          <span className="text-5xl" aria-hidden="true">{icon}</span>
         </div>
         <div className="ml-5 w-0 flex-1">
           <dl>
@@ -62,7 +68,7 @@ const Card = ({ icon, title, amount, amountSecond, className }: { icon: string, 
 
 export default function Year() {
   const { transactions, chiffresAffaires, nets, year, quartersDetails } = deserialize<LoaderData>(useLoaderData())
-  const { searchQuery } = useOutletContext<{searchQuery: string }>()
+  const { searchQuery } = useOutletContext<{ searchQuery: string }>()
 
   type QuarterTitle = keyof typeof quartersDetails
 
@@ -94,7 +100,7 @@ export default function Year() {
       }
     })
     .filter(transaction => searchQuery.toLowerCase().split(' ').every(word =>
-      Object.values(transaction).join(' ').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(word)
+      Object.values(transaction).join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(word),
     ))
 
 
@@ -146,7 +152,7 @@ export default function Year() {
                   <div className="block px-4 py-4 bg-white hover:bg-gray-50">
                     <span className="flex items-center space-x-4">
                       <span className="flex-1 flex space-x-2 truncate">
-                        <Icon className={classNames("flex-shrink-0 h-5 w-5 opacity-70", transaction.total > 0 ? 'text-green-400' : 'text-red-400')} aria-hidden="true" />
+                        <Icon className={classNames('flex-shrink-0 h-5 w-5 opacity-70', transaction.total > 0 ? 'text-green-400' : 'text-red-400')} aria-hidden="true" />
                         <span className="flex flex-1 flex-col text-gray-500 text-sm truncate">
                           <span className="truncate">{transaction.title})</span>
                           <span>
@@ -156,7 +162,7 @@ export default function Year() {
                             <span
                               className={classNames(
                                 statusStyles[transaction.status],
-                                'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium'
+                                'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium',
                               )}
                             >
                               {transaction.statusLabel}
@@ -188,7 +194,7 @@ export default function Year() {
                         <td className="max-w-0 w-full px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <div className="flex">
                             <div className="group inline-flex space-x-2 truncate text-sm">
-                              <Icon className={classNames("flex-shrink-0 h-5 w-5 opacity-70", transaction.total > 0 ? 'text-green-400' : 'text-red-400')} aria-hidden="true" />
+                              <Icon className={classNames('flex-shrink-0 h-5 w-5 opacity-70', transaction.total > 0 ? 'text-green-400' : 'text-red-400')} aria-hidden="true" />
 
                               <p className="text-gray-500 truncate group-hover:text-gray-900">{transaction.title}</p>
                             </div>
@@ -203,7 +209,7 @@ export default function Year() {
                             <span
                               className={classNames(
                                 statusStyles[transaction.status],
-                                'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium'
+                                'inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium',
                               )}
                             >
                               {transaction.statusLabel}

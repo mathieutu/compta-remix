@@ -1,33 +1,31 @@
-import React, { Fragment, ReactNode, useState } from 'react'
+import { LoaderFunction, Outlet, useLoaderData, useParams } from 'remix'
+import { getUser } from '../services/auth.server'
+import React, { Fragment, useState } from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
-import { yearsToFetch } from '../services/transactions'
-import { classNames } from '../utils/tw'
 import {
-  XIcon,
-  MenuAlt1Icon,
-  SearchIcon,
   ChevronDownIcon,
-  LogoutIcon,
-  PencilAltIcon,
   DocumentDuplicateIcon,
+  LogoutIcon,
+  MenuAlt1Icon,
+  PencilAltIcon,
+  SearchIcon,
+  XIcon,
 } from '@heroicons/react/outline'
+import { yearsToFetch } from '../services/transactions'
 import { Link } from '@remix-run/react'
-import { useParams } from 'remix'
+import { classNames } from '../utils/tw'
 
-const signOut = () => {
-  // todo to be implemented
-}
-type DefaultUser = {
-  name: string
-  email: string
-  image: string
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getUser(request)
+
+  return {
+    user,
+  }
 }
 
-export const App = ({
-  children,
-  user,
-  onSearch,
-}: { children: ReactNode, user: DefaultUser, onSearch: (searchQuery: string) => void }) => {
+export default function App() {
+  const { user } = useLoaderData()
+  const [searchQuery, setSearchQuery] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const params = useParams()
 
@@ -164,7 +162,7 @@ export const App = ({
                     className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
                     placeholder="Rechercher"
                     type="search"
-                    onChange={(e) => onSearch(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
               </form>
@@ -206,45 +204,45 @@ export const App = ({
                       >
                         <div className="py-1">
                           <Menu.Item>
-                              <a
-                                href="https://airtable.com/tblDxymNWvm8pJQno/viwXqk9tuBBdQS0kP"
-                                className="text-gray-700 group flex items-center px-4 py-2 text-sm"
-                                target="_blank" rel="noopener noreferrer"
-                              >
-                                <PencilAltIcon
-                                  className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                  aria-hidden="true"
-                                />
-                                Éditer
-                              </a>
+                            <a
+                              href="https://airtable.com/tblDxymNWvm8pJQno/viwXqk9tuBBdQS0kP"
+                              className="text-gray-700 group flex items-center px-4 py-2 text-sm"
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              <PencilAltIcon
+                                className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                aria-hidden="true"
+                              />
+                              Éditer
+                            </a>
                           </Menu.Item>
                           <Menu.Item>
-                              <a
-                                className="text-gray-700 group flex items-center px-4 py-2 text-sm"
-                                href="https://drive.google.com/drive/folders/1iO3kgSNOK0kbcBCOxfz6sS5urB2NrxSB"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <DocumentDuplicateIcon
-                                  className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                  aria-hidden="true"
-                                />
-                                Factures
-                              </a>
+                            <a
+                              className="text-gray-700 group flex items-center px-4 py-2 text-sm"
+                              href="https://drive.google.com/drive/folders/1iO3kgSNOK0kbcBCOxfz6sS5urB2NrxSB"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <DocumentDuplicateIcon
+                                className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                aria-hidden="true"
+                              />
+                              Factures
+                            </a>
                           </Menu.Item>
                         </div>
                         <div className="py-1">
                           <Menu.Item>
-                              <button
-                                onClick={() => signOut()}
-                                className="text-gray-700 group flex items-center px-4 py-2 text-sm"
-                              >
-                                <LogoutIcon
-                                  className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                  aria-hidden="true"
-                                />
-                                Déconnexion
-                              </button>
+                            <Link
+                              to="logout"
+                              className="text-gray-700 group flex items-center px-4 py-2 text-sm"
+                            >
+                              <LogoutIcon
+                                className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                aria-hidden="true"
+                              />
+                              Déconnexion
+                            </Link>
                           </Menu.Item>
                         </div>
                       </Menu.Items>
@@ -256,10 +254,7 @@ export const App = ({
           </div>
         </div>
         <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
-          {/* Page header */}
-
-          {children}
-
+          <Outlet context={{ searchQuery }} />
         </main>
       </div>
     </div>
